@@ -79,7 +79,6 @@ def config_reader(path_to_config_file):
     config_file.read(path_to_config_file)
 
     BASE_DIR = str(Path(os.getenv('SPOTSPEC_DIR', '/home/vampy/acads/projects/Spot_Spectrum_Ariel/Codes/SpotSpec')))
-    print(f"BASE_DIR: {BASE_DIR}")
     config_file['STAR']['limb_darkening_file'] = f"{BASE_DIR}{config_file['STAR']['limb_darkening_file']}"
     config_file['STAR']['stellar_parameters_file'] = f"{BASE_DIR}{config_file['STAR']['stellar_parameters_file']}"
     config_file['STAR.INHOM']['contrast_file'] = f"{BASE_DIR}{config_file['STAR.INHOM']['contrast_file']}"
