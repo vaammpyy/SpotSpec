@@ -94,9 +94,9 @@ def config_reader(path_to_config_file):
     parameter_dict['star']['parameter_file'] = config_file['STAR']['stellar_parameters_file']
 
     # populating inhomogenity dictionary
-    parameter_dict['inhomogeneties']['radius'] = [float(x.strip()) for x in config_file['STAR.INHOM']['radius'].split(',')]
-    parameter_dict['inhomogeneties']['latitude'] = [float(x.strip()) for x in config_file['STAR.INHOM']['latitude'].split(',')]
-    parameter_dict['inhomogeneties']['longitude'] = [float(x.strip()) for x in config_file['STAR.INHOM']['longitude'].split(',')]
+    parameter_dict['inhomogeneties']['radius'] = [float(x.strip()) for x in str(config_file['STAR.INHOM']['radius']).split(',')]
+    parameter_dict['inhomogeneties']['latitude'] = [float(x.strip()) for x in str(config_file['STAR.INHOM']['latitude']).split(',')]
+    parameter_dict['inhomogeneties']['longitude'] = [float(x.strip()) for x in str(config_file['STAR.INHOM']['longitude']).split(',')]
     parameter_dict['inhomogeneties']['contrast_list'] = read_contrast_file(config_file['STAR.INHOM']['contrast_file']) #this will parse the contrast list file to the reading function
 
     # populating planetary dictionary

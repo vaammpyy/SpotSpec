@@ -55,8 +55,11 @@ lon: Sequence[float] = (20.0,)
         map[1] = limb_darkening[1][j]
         map[2] = limb_darkening[2][j]
 
-        for i in range(len(lat)):
-            map.spot(contrast=contrast_list[j][i], radius=radius[i], lat=lat[i], lon=lon[i])
+        if len(lat) == 1:
+            map.spot(contrast=contrast_list[j], radius=radius[0], lat=lat[0], lon=lon[0])
+        else:
+            for i in range(len(lat)):
+                map.spot(contrast=contrast_list[j][i], radius=radius[i], lat=lat[i], lon=lon[i])
         map_list.append(map)
     
     return map_list

@@ -1,10 +1,19 @@
 from imports import *
 from forward_model import *
+
+import argparse
 from config_utils import config_reader
 import os
 from pathlib import Path
 
-config_file_path="./models/TOI-5205/test5/forward_model.cfg"
+parser = argparse.ArgumentParser(prog='SpotSpec Forward Model',
+                                    description='Runs the spot spectrum forward model.')
+
+parser.add_argument('-c', "--configfile",
+                    type=str,
+                    help='Path to the config file.')
+
+args = parser.parse_args()
 
 def generate_forward_model(parameter_dict):
     """
@@ -71,7 +80,7 @@ def run_forward_model(config_file_path):
     T14_hrs = parameter_dict['planet']['T14'] # in hours
     T14_seconds = T14_hrs*3600
 
-    time = np.arange(-T14_seconds/2, T14_seconds/2+60, 60)/(3600*24)
+    time = np.arange(-T14_seconds, T14_seconds+60, 60)/(3600*24)
     lightcurve_list = generate_lightcurve(system_list=system_list, time=time, path_to_save_lightcurve=parameter_dict['output']['path_to_lightcurve'])
 
     # plotting the lightcurve
@@ -96,7 +105,7 @@ def run_forward_model(config_file_path):
 
 
 
-run_forward_model(config_file_path=config_file_path)
+run_forward_model(config_file_path=args.configfile)
 # map_list=make_chromatic_stellar_surface(amp=[1,2], contrast_list=[(0, 0.5, 0.5, 0.3), (0, 0.3, 0.7, 0.3)], limb_darkening=[2,(0.5, 0.8), (0.25, 0.4)], radius=[15, 5, 30, 10], lat=[10, -10, 70, -5], lon=[-30, 15, 0, -5])
 # star_list=make_star(map_list, prot=10)
 # planet_list=make_planet(porb=2, radius=[10, 15])
