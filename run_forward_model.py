@@ -73,7 +73,7 @@ def run_forward_model(config_file_path):
     config_file_path : str
         Path to config file.
     """
-    start_time = time.time()
+    start_time = t.time()
     parameter_dict = config_reader(config_file_path)
     system_list = generate_forward_model(parameter_dict=parameter_dict)
 
@@ -92,7 +92,7 @@ def run_forward_model(config_file_path):
     ARIEL_noise_file = f"{BASE_DIR}{stellar_cfg['CHROMATIC']['photometric_precision']}"
     ARIEL_noise = np.loadtxt(ARIEL_noise_file)
     plot_lightcurve(lightcurve_list, ARIEL_noise, path_to_save=parameter_dict['output']['path_to_lightcurve_plot'])
-    stop_time = time.time()
+    stop_time = t.time()
     print(f"Time taken to run the forward model: {stop_time-start_time} seconds")
     
     #generating animation
