@@ -88,12 +88,13 @@ def run_forward_model(config_file_path):
     stellar_cfg.read(parameter_dict['star']['parameter_file'])
 
     BASE_DIR = str(Path(os.getenv('SPOTSPEC_DIR', '/home/vampy/acads/projects/Spot_Spectrum_Ariel/Codes/SpotSpec')))
+    print(f"BASE_DIR: {BASE_DIR}")
     ARIEL_noise_file = f"{BASE_DIR}{stellar_cfg['CHROMATIC']['photometric_precision']}"
     ARIEL_noise = np.loadtxt(ARIEL_noise_file)
     plot_lightcurve(lightcurve_list, ARIEL_noise, path_to_save=parameter_dict['output']['path_to_lightcurve_plot'])
     
     #generating animation
-    # anim = system_list[0].show(t=time, figsize=(8,8), show=False)
+    #system_list[0].show(t=time, figsize=(8,8), show=False)
     # print(f"Type of anim: {type(anim)}")
 
     # if anim is None:
