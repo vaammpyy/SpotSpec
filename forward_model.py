@@ -210,24 +210,40 @@ def generate_lightcurve(system_list, time, path_to_save_lightcurve=''):
         np.savetxt(path_to_save_lightcurve, np.array(lightcurve_list), delimiter=',')
     return lightcurve_list
 
-def simulate_ARIEL_lc(lightcurve, ARIEL_noise):
+def simulate_ARIEL_lc(lightcurve, ARIEL_noise, CHROMATIC=False):
     """
     Takes a lightcurve in one of the ARIEL's channel and simulates an observation with noise.
     The noise will depend on the object.
 
     Parameters
     ----------
-    lightcurve: 1D array
+    lightcurve: 1D array or 2D array
         Lightcurve in one of ARIEL's channel
-    ARIEL_noise: float
+    ARIEL_noise: float or 1D array
         Noise value in the ARIEL's channel for the target.
+    CHROMATIC: bool
+        Whether to simulate chromatic noise.
     
     Returns
     -------
     ARIEL_lightcurve: 1D array
         Simulated ARIEL observation in the given channel.
     """
-    noise_array = np.random.normal(loc=0.0, scale=ARIEL_noise, size=len(lightcurve))
+    if CHROMATIC:
+        # noise_array = []
+        # for i, lc in enumerate(lightcurve):
+        #     noise_array.append(np.random.normal(loc=0.0, scale=ARIEL_noise[i], size=len(lc)))
+        # # noise_array = np.random.normal(loc=0.0, scale=ARIEL_noise, size=len(lightcurve))
+        # noise_array = np.array(noise_array)
+        lightcurve = np.asarray(lightcurve, dtype=float)
+        ARIEL_noise = np.asarray(ARIEL_noise, dtype=float)
+        noise_array = np.random.normal(
+            loc=0.0,
+            scale=ARIEL_noise[:, None],   # shape: (n_wave, 1)
+            size=lightcurve.shape          # shape: (n_wave, n_time)
+        )
+    else:
+        noise_array = np.random.normal(loc=0.0, scale=ARIEL_noise, size=len(lightcurve))
     ARIEL_lightcurve = np.array(lightcurve) + noise_array
     return ARIEL_lightcurve
 

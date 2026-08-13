@@ -92,6 +92,15 @@ def run_forward_model(config_file_path):
     ARIEL_noise_file = f"{BASE_DIR}{stellar_cfg['CHROMATIC']['photometric_precision']}"
     ARIEL_noise = np.loadtxt(ARIEL_noise_file)
     plot_lightcurve(lightcurve_list, ARIEL_noise, path_to_save=parameter_dict['output']['path_to_lightcurve_plot'])
+
+    # Generating noise realizations of the lightcurve
+    for i in range(10):
+        noise_realization = simulate_ARIEL_lc(lightcurve_list, ARIEL_noise, CHROMATIC=True)
+
+        path_to_noise_realization = "/".join(parameter_dict['output']['path_to_lightcurve'].split('/')[:-1])+f"/synthetic_lightcurve_{i:02d}.csv"
+
+        np.savetxt(path_to_noise_realization, noise_realization, delimiter=',')
+    
     stop_time = t.time()
     print(f"Time taken to run the forward model: {stop_time-start_time} seconds")
     
