@@ -203,7 +203,8 @@ def generate_lightcurve(system_list, time, path_to_save_lightcurve=''):
     """
     lightcurve_list = []
     for system in system_list:
-        flux_system = system.flux(time).eval()
+        # flux_system = system.flux(time).eval()
+        flux_system = system.flux(time)
         lightcurve_list.append(flux_system)
     if path_to_save_lightcurve:
         np.savetxt(path_to_save_lightcurve, np.array(lightcurve_list), delimiter=',')
