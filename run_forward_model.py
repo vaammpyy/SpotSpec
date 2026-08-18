@@ -13,6 +13,8 @@ parser.add_argument('-c', "--configfile",
                     type=str,
                     help='Path to the config file.')
 
+parser.add_argument('-a','--animation', type=str2bool, default=False, help='Generates an animation of the system.')
+
 args = parser.parse_args()
 
 def generate_forward_model(parameter_dict):
@@ -62,7 +64,7 @@ def generate_forward_model(parameter_dict):
 
     return system_list
 
-def run_forward_model(config_file_path):
+def run_forward_model(config_file_path, generate_animation=False):
     """
     Runs the forward model.
 
@@ -72,6 +74,8 @@ def run_forward_model(config_file_path):
     ----------
     config_file_path : str
         Path to config file.
+    generate_animation : bool, optional
+        Whether to generate an animation of the system. Default is False.
     """
     start_time = t.time()
     parameter_dict = config_reader(config_file_path)
@@ -105,7 +109,8 @@ def run_forward_model(config_file_path):
     print(f"Time taken to run the forward model: {stop_time-start_time} seconds")
     
     #generating animation
-    #system_list[0].show(t=time, figsize=(8,8), show=False)
+    if generate_animation:
+        system_list[0].show(t=time, figsize=(8,8), show=False)
     # print(f"Type of anim: {type(anim)}")
 
     # if anim is None:
@@ -117,7 +122,7 @@ def run_forward_model(config_file_path):
 
 
 
-run_forward_model(config_file_path=args.configfile)
+run_forward_model(config_file_path=args.configfile, generate_animation=args.animation)
 # map_list=make_chromatic_stellar_surface(amp=[1,2], contrast_list=[(0, 0.5, 0.5, 0.3), (0, 0.3, 0.7, 0.3)], limb_darkening=[2,(0.5, 0.8), (0.25, 0.4)], radius=[15, 5, 30, 10], lat=[10, -10, 70, -5], lon=[-30, 15, 0, -5])
 # star_list=make_star(map_list, prot=10)
 # planet_list=make_planet(porb=2, radius=[10, 15])
