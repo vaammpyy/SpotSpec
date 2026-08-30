@@ -10,7 +10,7 @@ contrast_list: Sequence[Sequence[float]] = ((0.5,),),
 radius: Sequence[float] = (20.0,), 
 lat: Sequence[float] = (20.0,), 
 lon: Sequence[float] = (20.0,),
-unspotted: bool = False
+unspotted: bool = False,
 ):
     """
     Makes a chromatic stelllar surface stellar surface.
