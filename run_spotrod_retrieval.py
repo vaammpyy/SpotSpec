@@ -193,7 +193,10 @@ def compute_model_LC_spotrod(theta):
     #==============
     # Planet radius
     #==============
-    planet_radius = params['planet_radius']
+    if args.starname == 'GJ-1132' or args.starname == 'TOI-540':
+        planet_radius = params['planet_radius']
+    if args.starname == 'TOI-5205':
+        planet_radius = 10**params['planet_radius']
     planetangle = np.array([spotrod.circleangle(r, planet_radius, z[i]) for i in range(z.size)], dtype=np.float64)
 
     #===========
@@ -201,9 +204,9 @@ def compute_model_LC_spotrod(theta):
     #===========
     if modelname == '1-SPOT':
         spot_contrast_starry = params['c1']
-        spot_radius_deg = params['r1']
-        spot_lat = params['lat1']
-        spot_lon = params['lon1']
+        spot_radius_deg = 10**params['r1']
+        spot_lat = np.degrees(np.arcsin(params['lat1']))
+        spot_lon = np.degrees(np.arcsin(params['lon1']))
 
         spot_x1, spot_y1 = transform_polar_to_cartesian(spot_lat=spot_lat, spot_lon=spot_lon)
         spot_radius_rstar1 = get_spot_radius(spot_radius_deg)
@@ -228,18 +231,18 @@ def compute_model_LC_spotrod(theta):
 
     if modelname == '2-SPOT':
         spot_contrast_starry_1 = params['c1']
-        spot_radius_deg_1 = params['r1']
-        spot_lat_1 = params['lat1']
-        spot_lon_1 = params['lon1']
+        spot_radius_deg_1 = 10**params['r1']
+        spot_lat_1 = np.degrees(np.arcsin(params['lat1']))
+        spot_lon_1 = np.degrees(np.arcsin(params['lon1']))
 
         spot_x1, spot_y1 = transform_polar_to_cartesian(spot_lat=spot_lat_1, spot_lon=spot_lon_1)
         spot_radius_rstar1 = get_spot_radius(spot_radius_deg_1)
         spot_contrast_spotrod_1 = 1 - spot_contrast_starry_1
 
         spot_contrast_starry_2 = params['c2']
-        spot_radius_deg_2 = params['r2']
-        spot_lat_2 = params['lat2']
-        spot_lon_2 = params['lon2']
+        spot_radius_deg_2 = 10**params['r2']
+        spot_lat_2 = np.degrees(np.arcsin(params['lat2']))
+        spot_lon_2 = np.degrees(np.arcsin(params['lon2']))
 
         spot_x2, spot_y2 = transform_polar_to_cartesian(spot_lat=spot_lat_2, spot_lon=spot_lon_2)
         spot_radius_rstar2 = get_spot_radius(spot_radius_deg_2)
@@ -310,7 +313,7 @@ def prior(cube, ndim, nparams):
         cube[3] = planet_radius_mean + planet_radius_std * ndtri(cube[3]) # N(r_mean, r_stddev) here planet radius is in R_planet/R_star
     if args.starname == 'TOI-5205':
         # sampling in log-uniform space for TOI-5205
-        cube[3] = np.log10(planet_radius_log_lower_limit + (planet_radius_log_upper_limit - planet_radius_log_lower_limit) * cube[3])
+        cube[3] = planet_radius_log_lower_limit + (planet_radius_log_upper_limit - planet_radius_log_lower_limit) * cube[3]
 
     if modelname == '1-SPOT':
         # ----------------------------------------------------
@@ -321,21 +324,22 @@ def prior(cube, ndim, nparams):
         # ----------------------------------------------------
         # 4. Spot Angular Radius: r1 (in degrees)
         # ----------------------------------------------------
-        cube[5] = 10**(-1 + 2.95*cube[5]) # log_r = U[-1, 1.95]
+        cube[5] = -1 + 2.95*cube[5] # log_r = U[-1, 1.95]
 
         # ----------------------------------------------------
         # 5. Spot Latitude: lat1 (in degrees)
         #    Isotropic sphere prior: Uniform in sin(latitude)
         # ----------------------------------------------------
-        sin_lat = cube[6]  # Uniform [0, 1]
-        cube[6] = np.degrees(np.arcsin(sin_lat))  # lat1: [0, 90.0] deg, sampling only in the positive half
+        # sin_lat = cube[6]  # Uniform [0, 1]
+        # cube[6] = np.degrees(np.arcsin(sin_lat))  # lat1: [0, 90.0] deg, sampling only in the positive half
+        cube[6] = cube[6]
 
         # ----------------------------------------------------
         # 6. Spot Longitude: lon1 (in degrees)
         #    Uniform across visible/transit longitude span
         # ----------------------------------------------------
-        sin_lon = 2 * cube[7] - 1 # Uniform [-1, 1]
-        cube[7] = np.degrees(np.arcsin(sin_lon))  # lon1: [-90, 90.0] deg
+        cube[7] = 2 * cube[7] - 1 # Uniform [-1, 1]
+        # cube[7] = np.degrees(np.arcsin(sin_lon))  # lon1: [-90, 90.0] deg
     
     if modelname == '2-SPOT':
         # ----------------------------------------------------
@@ -346,21 +350,22 @@ def prior(cube, ndim, nparams):
         # ----------------------------------------------------
         # 4. Spot Angular Radius: r1 (in degrees)
         # ----------------------------------------------------
-        cube[5] = 10**(-1 + 2.95*cube[5]) # log_r = U[-1, 1.95]
+        cube[5] = -1 + 2.95*cube[5] # log_r = U[-1, 1.95]
 
         # ----------------------------------------------------
         # 5. Spot Latitude: lat1 (in degrees)
         #    Isotropic sphere prior: Uniform in sin(latitude)
         # ----------------------------------------------------
-        sin_lat = cube[6]  # Uniform [0, 1]
-        cube[6] = np.degrees(np.arcsin(sin_lat))  # lat1: [0, 90.0] deg, sampling only in the positive half
+        # sin_lat = cube[6]  # Uniform [0, 1]
+        # cube[6] = np.degrees(np.arcsin(sin_lat))  # lat1: [0, 90.0] deg, sampling only in the positive half
+        cube[6] = cube[6]
 
         # ----------------------------------------------------
         # 6. Spot Longitude: lon1 (in degrees)
         #    Uniform across visible/transit longitude span
         # ----------------------------------------------------
-        sin_lon = 2 * cube[7] - 1  # Uniform [-1, 1]
-        cube[7] = np.degrees(np.arcsin(sin_lon))  # lon1: [-90, 90.0] deg
+        cube[7] = 2 * cube[7] - 1 # Uniform [-1, 1]
+        # cube[7] = np.degrees(np.arcsin(sin_lon))  # lon1: [-90, 90.0] deg
 
         # ----------------------------------------------------
         # 7. Spot Contrast: c1, starry contrast
@@ -370,26 +375,30 @@ def prior(cube, ndim, nparams):
         # ----------------------------------------------------
         # 9. Spot Angular Radius: r1 (in degrees)
         # ----------------------------------------------------
-        cube[9] = 10**(-1 + 2.95*cube[9]) # log_r = U[-1, 1.95]
+        cube[9] = -1 + 2.95*cube[9] # log_r = U[-1, 1.95]
 
         # ----------------------------------------------------
         # 10. Spot Latitude: lat1 (in degrees)
         #    Isotropic sphere prior: Uniform in sin(latitude)
         # ----------------------------------------------------
-        sin_lat = cube[10]  # Uniform [0, 1]
-        cube[10] = np.degrees(np.arcsin(sin_lat))  # lat1: [0, 90.0] deg, sampling only in the positive half
+        cube[10] = cube[10]  # Uniform [0, 1]
 
         # ----------------------------------------------------
         # 11. Spot Longitude: lon1 (in degrees)
         #    Uniform across visible/transit longitude span
         # ----------------------------------------------------
-        sin_lon = 2 * cube[11] -1  # Uniform [-1, 1]
-        cube[11] = np.degrees(np.arcsin(sin_lon))  # lon1: [-90, 90.0] deg
+        cube[11] = 2 * cube[11] -1  # Uniform [-1, 1]
+
+eval_count = 0
 
 def loglikelihood(cube, ndim, nparams):
     """
     Computes the log-likelihood function for a given set of parameters.
     """
+    global eval_count
+    eval_count += 1
+    if eval_count == 1:
+        print(f"[Rank {rank}/{size}] Actively evaluating likelihoods!", flush=True)
     theta = [cube[i] for i in range(ndim)]
 
     u1, u2 = theta[1], theta[2]
@@ -429,56 +438,60 @@ else:
     for synthetic_data_file in synthetic_data_files:
         synthetic_observation = np.loadtxt(synthetic_data_file, delimiter=',')
         SYN_NUM = int(synthetic_data_file.split("/")[-1].split(".")[0].split("_")[-1])
+        # Only analyzing the first 5 synthetic noise realizations.
+        if SYN_NUM>5:
+            continue
         if rank == 0:
             print("****************************")
             print(f"Synthetic Observation: {SYN_NUM:02d}.")
             print("****************************")
 
         onespot_idx = np.where(mask_onespot)[0]
-        twospot_idx = np.where(mask_twospot)[0]
+        # Not fitting any of the Two spot models.
+        # twospot_idx = np.where(mask_twospot)[0]
 
-        for idx in twospot_idx:
-            modelname = '2-SPOT'
-            param_names = ['offset', 'u1', 'u2', 'planet_radius', 'c1', 'r1', 'lat1', 'lon1', 'c2', 'r2', 'lat2', 'lon2']
+        # for idx in twospot_idx:
+        #     modelname = '2-SPOT'
+        #     param_names = ['offset', 'u1', 'u2', 'planet_radius', 'c1', 'r1', 'lat1', 'lon1', 'c2', 'r2', 'lat2', 'lon2']
 
-            PPE = PPE_list[idx]
-            MEAN_MU1 = LD[0][idx]
-            MEAN_MU2 = LD[1][idx]
-            # if rank==0:
-            #     print(MEAN_MU1)
-            #     print(MEAN_MU2)
-            #     input()
+        #     PPE = PPE_list[idx]
+        #     MEAN_MU1 = LD[0][idx]
+        #     MEAN_MU2 = LD[1][idx]
+        #     # if rank==0:
+        #     #     print(MEAN_MU1)
+        #     #     print(MEAN_MU2)
+        #     #     input()
 
-            channel_flux = synthetic_observation[idx][:-1]
-            mean_oot_channel_flux = np.mean(channel_flux[mask_oot])
-            data_offset = 1 - mean_oot_channel_flux
+        #     channel_flux = synthetic_observation[idx][:-1]
+        #     mean_oot_channel_flux = np.mean(channel_flux[mask_oot])
+        #     data_offset = 1 - mean_oot_channel_flux
 
-            channel_flux = channel_flux + data_offset
-            channel_flux_err = PPE
-            if rank == 0:
-                print("============================")
-                print(f"Channel number: {idx:03d}.")
-                print("============================")
-            #====================
-            # Running pymultinest
-            #====================
-            start_time = t.time()
-            pymultinest.run(
-                loglikelihood,
-                prior,
-                n_dims=len(param_names),
-                outputfiles_basename=f"{chains_path}/SYN{SYN_NUM:02d}_{modelname}_CH{idx:03d}_",
-                n_live_points = N_L,
-                sampling_efficiency = sampling_efficiency,
-                evidence_tolerance = evidence_tolerance,
-                multimodal = multimodal,
-                resume = False,
-                verbose = (rank == 0),
-                init_MPI = False, # MPI has been initialized manually
-            )
-            stop_time = t.time()
-            if rank == 0:
-                print(f"MODEL_NAME:{modelname} /\/\/\ TIME TAKEN:{stop_time-start_time:.2f}")
+        #     channel_flux = channel_flux + data_offset
+        #     channel_flux_err = PPE
+        #     if rank == 0:
+        #         print("============================")
+        #         print(f"Channel number: {idx:03d}.")
+        #         print("============================")
+        #     #====================
+        #     # Running pymultinest
+        #     #====================
+        #     start_time = t.time()
+        #     pymultinest.run(
+        #         loglikelihood,
+        #         prior,
+        #         n_dims=len(param_names),
+        #         outputfiles_basename=f"{chains_path}/SYN{SYN_NUM:02d}_{modelname}_CH{idx:03d}_",
+        #         n_live_points = N_L,
+        #         sampling_efficiency = sampling_efficiency,
+        #         evidence_tolerance = evidence_tolerance,
+        #         multimodal = multimodal,
+        #         resume = False,
+        #         verbose = (rank == 0),
+        #         init_MPI = False, # MPI has been initialized manually
+        #     )
+        #     stop_time = t.time()
+        #     if rank == 0:
+        #         print(f"MODEL_NAME:{modelname} /\/\/\ TIME TAKEN:{stop_time-start_time:.2f}")
 
         for idx in onespot_idx:
             modelname = '1-SPOT'
