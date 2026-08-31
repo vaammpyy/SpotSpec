@@ -439,7 +439,7 @@ else:
         synthetic_observation = np.loadtxt(synthetic_data_file, delimiter=',')
         SYN_NUM = int(synthetic_data_file.split("/")[-1].split(".")[0].split("_")[-1])
         # Only analyzing the first 5 synthetic noise realizations.
-        if SYN_NUM>5:
+        if SYN_NUM<=5:
             continue
         if rank == 0:
             print("****************************")
