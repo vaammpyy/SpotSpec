@@ -44,8 +44,8 @@ if args.starname == 'TOI-5205':
 #======================
 # PYMULTINEST VARIABLES
 #======================
-N_L = 100
-evidence_tolerance = 0.8
+N_L = 1000
+evidence_tolerance = 0.5
 sampling_efficiency = 'parameter'
 multimodal = True
 
