@@ -408,10 +408,10 @@ def loglikelihood(cube, ndim, nparams):
     """
     Computes the log-likelihood function for a given set of parameters.
     """
-    global eval_count
-    eval_count += 1
-    if eval_count == 1:
-        print(f"[Rank {rank}/{size}] Actively evaluating likelihoods!", flush=True)
+    # global eval_count
+    # eval_count += 1
+    # if eval_count == 1:
+        # print(f"[Rank {rank}/{size}] Actively evaluating likelihoods!", flush=True)
     theta = [cube[i] for i in range(ndim)]
 
     u1, u2 = theta[1], theta[2]
@@ -546,7 +546,7 @@ else:
                 evidence_tolerance = evidence_tolerance,
                 multimodal = multimodal,
                 resume = args.resume,
-                verbose = (rank == 0),
+                verbose = False,
                 init_MPI = False, # MPI has been initialized manually
             )
             stop_time = t.time()
