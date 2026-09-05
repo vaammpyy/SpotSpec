@@ -129,6 +129,7 @@ def get_orbital_semimajor_axis(period):
     return a
 
 BASE_FOLDER = f"{BASE_DIR}/models/{args.directory}"
+print(BASE_FOLDER)
 
 forward_model_config_file = f"{BASE_FOLDER}/forward_model.cfg"
 
