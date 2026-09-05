@@ -545,7 +545,7 @@ else:
                 sampling_efficiency = sampling_efficiency,
                 evidence_tolerance = evidence_tolerance,
                 multimodal = multimodal,
-                resume = True,
+                resume = args.resume,
                 verbose = (rank == 0),
                 init_MPI = False, # MPI has been initialized manually
             )
