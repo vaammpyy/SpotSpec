@@ -138,6 +138,7 @@ forward_model_config.read(forward_model_config_file)
 stellar_parameters_file = forward_model_config['STAR']['stellar_parameters_file']
 
 stellar_config = cfg.ConfigParser()
+print(f"Reading stellar parameters from {BASE_DIR}{stellar_parameters_file}")
 stellar_config.read(f"{BASE_DIR}{stellar_parameters_file}")
 
 #===============================
