@@ -66,8 +66,10 @@ size = comm.Get_size()
 # ----------
 if args.local:
     BASE_DIR = "/home/vampy/acads/projects/Spot_Spectrum_Ariel/Codes/SpotSpec"
+    BASE_FWD_MODEL_DIR = "/home/vampy/acads/projects/Spot_Spectrum_Ariel/Codes/SpotSpec/"
 else:
     BASE_DIR = "/home/krohan/SpotSpec"
+    BASE_FWD_MODEL_DIR = "/home/krohan/scratch/SpotSpec"
 
 def get_out_of_transit(T14_hours):
     """
@@ -420,7 +422,7 @@ def loglikelihood(cube, ndim, nparams):
     chi2 = np.sum((residuals/channel_flux_err)**2)
     return -0.5 * chi2  # Assuming Gaussian errors, ignoring constant terms
 
-forward_model_directory = f"{BASE_DIR}/{args.directory}"
+forward_model_directory = f"{BASE_FWD_MODEL_DIR}/{args.directory}"
 synthetic_data_files = glob.glob(f"{forward_model_directory}/synthetic*.csv")
 modelname_list = np.loadtxt(f"{forward_model_directory}/preffered_model.txt", delimiter=',', dtype=str)
 
@@ -433,7 +435,7 @@ LD = np.loadtxt(LD_file_path, delimiter=',').T
 mask_onespot = modelname_list == '1-SPOT'
 mask_twospot = modelname_list == '2-SPOT'
 
-chains_path = f"{BASE_FOLDER}/chains"
+chains_path = f"{BASE_FWD_MODEL_DIR}/{args.directory}/chains"
 
 if rank == 0:
     os.makedirs(chains_path, exist_ok=True)
@@ -542,7 +544,7 @@ else:
                 sampling_efficiency = sampling_efficiency,
                 evidence_tolerance = evidence_tolerance,
                 multimodal = multimodal,
-                resume = args.resume,
+                resume = True,
                 verbose = (rank == 0),
                 init_MPI = False, # MPI has been initialized manually
             )
