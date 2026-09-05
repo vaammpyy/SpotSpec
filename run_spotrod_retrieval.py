@@ -128,7 +128,7 @@ def get_orbital_semimajor_axis(period):
     a = np.cbrt(numerator/denominator).to(stellar_radius)
     return a
 
-BASE_FOLDER = f"{BASE_DIR}/{args.directory}"
+BASE_FOLDER = f"{BASE_DIR}/models/{args.directory}"
 
 forward_model_config_file = f"{BASE_FOLDER}/forward_model.cfg"
 
@@ -138,7 +138,6 @@ forward_model_config.read(forward_model_config_file)
 stellar_parameters_file = forward_model_config['STAR']['stellar_parameters_file']
 
 stellar_config = cfg.ConfigParser()
-print(f"Reading stellar parameters from {BASE_DIR}{stellar_parameters_file}")
 stellar_config.read(f"{BASE_DIR}{stellar_parameters_file}")
 
 #===============================
