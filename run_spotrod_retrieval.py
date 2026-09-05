@@ -129,7 +129,7 @@ def get_orbital_semimajor_axis(period):
     return a
 
 # BASE_FOLDER = f"{BASE_DIR}/{args.directory}"
-BASE_FOLDER_FWD_MODEL = f"{BASE_FOLDER_FWD_MODEL}/{args.directory}"
+BASE_FOLDER_FWD_MODEL = f"{BASE_FWD_MODEL_DIR}/{args.directory}"
 
 forward_model_config_file = f"{BASE_FOLDER_FWD_MODEL}/forward_model.cfg"
 
