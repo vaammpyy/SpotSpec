@@ -25,6 +25,11 @@ parser = argparse.ArgumentParser(prog='Runs spot parameter retrievals.')
 parser.add_argument('-d', '--directory', type=str, help='Directory to perform retrievals on')
 parser.add_argument('-l', "--local", type=str2bool, default=False, help='Running on the local device')
 parser.add_argument('-s', '--starname', type=str, help="Star name")
+parser.add_argument('-c', '--channel_number', type=int, default=-1, help="Channel number to run retrievals on.")
+parser.add_argument('-n', '--noise_number', type=int, default=-1, help="Noise realization to run the retrieval on.")
+parser.add_argument('--nlive', type=int, default=1000, help="Number of live points for the nested sampling.")
+parser.add_argument('--evidence_tolerance', type=float, default=0.5, help="Evidence tolerance for the nested sampling.")
+parser.add_argument('--resume', type=str2bool, default=False, help="Resume the retrieval from a previous run.")
 
 args = parser.parse_args()
 
@@ -38,14 +43,14 @@ if args.starname == 'TOI-540':
     planet_radius_mean = 0.0436
     planet_radius_std = 0.0012
 if args.starname == 'TOI-5205':
-    planet_radius_log_lower_limit = -5
-    planet_radius_log_upper_limit = 0
+    planet_radius_lower_limit = 0.00001 # avoiding a zero value for planet radius
+    planet_radius_upper_limit = 0.5
 
 #======================
 # PYMULTINEST VARIABLES
 #======================
-N_L = 1000
-evidence_tolerance = 0.5
+N_L = args.nlive
+evidence_tolerance = args.evidence_tolerance
 sampling_efficiency = 'parameter'
 multimodal = True
 
@@ -95,8 +100,12 @@ def transform_polar_to_cartesian(spot_lat, spot_lon):
 def get_spot_radius(deg):
     """
     Takes in spot radius in degrees and converts it into spot radius in stellar radius units.
+    The relation r_spotrod = deg * np.pi/180, is only valid for small spot angles. When performing
+    retrievals this cannot be used as we are spanning a larger range then the relation becomes.
+    r_spotrod = np.sin(deg * np.pi/180), here the angles inside the sin is in radians.
+    The returned r_spotrod is in the units of R_star.
     """
-    return deg * np.pi/180
+    return np.sin(deg * np.pi/180)
 
 def get_orbital_semimajor_axis(period):
     """
@@ -193,10 +202,11 @@ def compute_model_LC_spotrod(theta):
     #==============
     # Planet radius
     #==============
-    if args.starname == 'GJ-1132' or args.starname == 'TOI-540':
-        planet_radius = params['planet_radius']
-    if args.starname == 'TOI-5205':
-        planet_radius = 10**params['planet_radius']
+    # if args.starname == 'GJ-1132' or args.starname == 'TOI-540':
+    #     planet_radius = params['planet_radius']
+    # if args.starname == 'TOI-5205':
+    #     planet_radius = 10**params['planet_radius']
+    planet_radius = params['planet_radius']
     planetangle = np.array([spotrod.circleangle(r, planet_radius, z[i]) for i in range(z.size)], dtype=np.float64)
 
     #===========
@@ -313,7 +323,7 @@ def prior(cube, ndim, nparams):
         cube[3] = planet_radius_mean + planet_radius_std * ndtri(cube[3]) # N(r_mean, r_stddev) here planet radius is in R_planet/R_star
     if args.starname == 'TOI-5205':
         # sampling in log-uniform space for TOI-5205
-        cube[3] = planet_radius_log_lower_limit + (planet_radius_log_upper_limit - planet_radius_log_lower_limit) * cube[3]
+        cube[3] = planet_radius_lower_limit + (planet_radius_upper_limit - planet_radius_lower_limit) * cube[3]
 
     if modelname == '1-SPOT':
         # ----------------------------------------------------
@@ -438,15 +448,23 @@ else:
     for synthetic_data_file in synthetic_data_files:
         synthetic_observation = np.loadtxt(synthetic_data_file, delimiter=',')
         SYN_NUM = int(synthetic_data_file.split("/")[-1].split(".")[0].split("_")[-1])
-        # Only analyzing the first 5 synthetic noise realizations.
-        if SYN_NUM<=5:
+
+        if args.noise_number == -1:
+            pass
+        elif args.noise_number == SYN_NUM:
+            pass
+        else:
             continue
+
         if rank == 0:
             print("****************************")
             print(f"Synthetic Observation: {SYN_NUM:02d}.")
             print("****************************")
 
-        onespot_idx = np.where(mask_onespot)[0]
+        if args.channel_number != -1:
+            onespot_idx = [args.channel_number]
+        else:
+            onespot_idx = np.where(mask_onespot)[0]
         # Not fitting any of the Two spot models.
         # twospot_idx = np.where(mask_twospot)[0]
 
@@ -524,10 +542,10 @@ else:
                 sampling_efficiency = sampling_efficiency,
                 evidence_tolerance = evidence_tolerance,
                 multimodal = multimodal,
-                resume = False,
+                resume = args.resume,
                 verbose = (rank == 0),
                 init_MPI = False, # MPI has been initialized manually
             )
             stop_time = t.time()
             if rank == 0:
-                print(f"MODEL_NAME:{modelname} /\/\/\ TIME TAKEN:{stop_time-start_time:.2f}")
+                print(f"STATUS:SUCCESS /\/\/\ SYNID:{SYN_NUM:02d} /\/\/\ CHANNEL:{idx:03d} /\/\/\ MODEL_NAME:{modelname} /\/\/\ TIME TAKEN:{stop_time-start_time:.2f}")
