@@ -6,6 +6,16 @@ from config_utils import config_reader
 import os
 from pathlib import Path
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ("yes", "true", "t", "1"):
+        return True
+    elif v.lower() in ("no", "false", "f", "0"):
+        return False
+    raise argparse.ArgumentTypeError("Boolean value expected.")
+
+
 parser = argparse.ArgumentParser(prog='SpotSpec Forward Model',
                                     description='Runs the spot spectrum forward model.')
 
