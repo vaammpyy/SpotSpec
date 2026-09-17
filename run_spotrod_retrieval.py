@@ -46,6 +46,10 @@ if args.starname == 'TOI-5205':
     planet_radius_lower_limit = 0.00001 # avoiding a zero value for planet radius
     planet_radius_upper_limit = 0.5
 
+if args.starname == 'HD-189733':
+    planet_radius_lower_limit = 0.00001 # avoiding a zero value for planet radius
+    planet_radius_upper_limit = 0.5
+
 #======================
 # PYMULTINEST VARIABLES
 #======================
@@ -325,6 +329,9 @@ def prior(cube, ndim, nparams):
     if args.starname == 'GJ-1132' or args.starname == 'TOI-540':
         cube[3] = planet_radius_mean + planet_radius_std * ndtri(cube[3]) # N(r_mean, r_stddev) here planet radius is in R_planet/R_star
     if args.starname == 'TOI-5205':
+        # sampling in log-uniform space for TOI-5205
+        cube[3] = planet_radius_lower_limit + (planet_radius_upper_limit - planet_radius_lower_limit) * cube[3]
+    if args.starname == 'HD-189733':
         # sampling in log-uniform space for TOI-5205
         cube[3] = planet_radius_lower_limit + (planet_radius_upper_limit - planet_radius_lower_limit) * cube[3]
 
